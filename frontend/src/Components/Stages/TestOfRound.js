@@ -11,9 +11,46 @@ import AddQuestionForm from '../Forms/AddQuestionForm';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import EditFunction from '../UtilityComponents/EditFunction';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import FormProvider from '../UtilityComponents/FormProvider';
+
 
 const TestOfRound = () =>
 {
+    const initial =
+    {
+        question_text: "",
+        ans: "",
+        total_marks: "",
+        section_id: "",
+        assignee_id: [] // multiple
+    };
+    const model = 'questions';
+
+    const { MyForm, MyTextField, MySelectField } = FormProvider(initial, model);
+
+    const [members, setMembers] = useState([]);
+    useEffect(() =>
+    {
+        const url = Links.members_api;
+        axios
+            .get
+            (
+                url
+            )
+            .then
+            ((response) =>
+            {
+                if (response.status === 200 || response.status === 201)
+                {
+                    setMembers(response.data)
+                }
+            })
+            .catch((error) =>
+            {
+                console.log(error);
+            });
+    }, []);
+
     const location = useLocation();
     // todo: on using history if just typed then will not get the seasonID as no history and direct landed
     const seasonID = location.state.sId;
@@ -126,6 +163,8 @@ const TestOfRound = () =>
                                     <div className='flexClass'>
                                         <h2>
                                             Section: {section.section_name}
+                                            {initial['section_id'] = section.id}
+                                            {console.log(initial)}
                                             {/* todo: add accordion condtion of only one open at once */}
                                         </h2>
                                         <div className='addSign'>
@@ -137,8 +176,14 @@ const TestOfRound = () =>
                                                 }
                                                 dataChild=
                                                 {
-                                                    <AddQuestionForm sectionID={section.id}
-                                                    />
+                                                    // <AddQuestionForm sectionID={section.id}
+                                                    // />
+                                                    <MyForm>
+                                                        <MyTextField field="question_text" />
+                                                        <MyTextField field="total_marks" />
+                                                        <MySelectField field='assignee_id' data={members} />
+                                                        <MyTextField field="ans" />
+                                                    </MyForm>
                                                 }
                                                 title="Add Questions"
                                             />
